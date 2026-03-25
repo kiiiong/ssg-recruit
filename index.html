@@ -1,156 +1,27 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SAN SAN GEAR Job Application</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: #fff; color: #1a1a1a; font-family: 'Inter', sans-serif; font-size: 14px; line-height: 1.5; overflow-x: hidden; }
-  .page { display: none; max-width: 620px; margin: 0 auto; padding: 40px 24px 60px; }
-  .page.active { display: block; }
-  h1 { font-size: 24px; font-weight: 700; margin-bottom: 28px; letter-spacing: -0.01em; }
-  .field-label { font-size: 12px; font-weight: 500; color: #555; margin-bottom: 6px; display: flex; align-items: center; gap: 3px; }
-  .field-label .req { color: #e53e3e; }
-  .select-wrapper { position: relative; margin-bottom: 16px; }
-  select { width: 100%; appearance: none; border: 1px solid #e0e0e0; border-radius: 6px; padding: 9px 36px 9px 12px; font-size: 14px; font-family: inherit; color: #1a1a1a; background: #fff; outline: none; cursor: pointer; transition: border-color 0.12s; }
-  select:focus { border-color: #999; }
-  select.placeholder { color: #b0b0b0; }
-  .select-arrow { position: absolute; right: 11px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #aaa; }
-  .fields-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-  .field-group { display: flex; flex-direction: column; gap: 5px; }
-  input[type="text"], input[type="email"], input[type="tel"], input[type="url"] { border: 1px solid #e0e0e0; border-radius: 6px; padding: 9px 12px; font-size: 14px; font-family: inherit; color: #1a1a1a; outline: none; background: #fff; transition: border-color 0.12s; width: 100%; }
-  input::placeholder { color: #b0b0b0; }
-  input:focus { border-color: #999; }
-  .file-section { margin-top: 20px; }
-  .upload-box { border: 1.5px dashed #d4d4d4; border-radius: 8px; padding: 24px 20px; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; position: relative; background: #fff; transition: border-color 0.12s, background 0.12s; }
-  .upload-box:hover, .upload-box.dragover { border-color: #999; background: #fafafa; }
-  .upload-box.has-file { border-style: solid; border-color: #38a169; background: #f0fff4; }
-  .upload-box input[type="file"] { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
-  .upload-main { display: flex; align-items: center; gap: 7px; font-size: 13px; color: #555; }
-  .upload-hint { font-size: 11px; color: #b0b0b0; }
-  .upload-filename { font-size: 13px; color: #38a169; font-weight: 500; display: none; }
-  .upload-box.has-file .upload-main, .upload-box.has-file .upload-hint { display: none; }
-  .upload-box.has-file .upload-filename { display: block; }
-  .err { font-size: 12px; color: #e53e3e; margin-top: 5px; display: none; }
-  .submit-row { margin-top: 28px; }
-  .submit-btn { display: inline-flex; align-items: center; gap: 8px; background: #1a1a1a; color: #fff; font-family: inherit; font-size: 14px; font-weight: 500; border: none; border-radius: 8px; padding: 10px 20px; cursor: pointer; transition: background 0.12s; }
-  .submit-btn:hover { background: #333; }
-  .submit-btn:disabled { background: #ccc; cursor: not-allowed; }
-  .status-loading { margin-top: 12px; font-size: 13px; color: #888; display: none; }
-  .status-error { margin-top: 12px; padding: 10px 14px; border-radius: 6px; font-size: 13px; background: #fff5f5; color: #c53030; border: 1px solid #feb2b2; display: none; }
-  #page2 { padding-top: 60px; }
-  .thankyou-title { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
-  .thankyou-sub { font-size: 14px; color: #666; }
-  .tally-footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid #e8e8e8; display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #aaa; }
-  .toggle-label { display: flex; align-items: center; gap: 6px; }
-  .toggle-pill { width: 32px; height: 18px; background: #2563eb; border-radius: 9px; position: relative; flex-shrink: 0; }
-  .toggle-pill::after { content: ''; position: absolute; right: 3px; top: 3px; width: 12px; height: 12px; background: #fff; border-radius: 50%; }
-  @media (max-width: 480px) { .fields-row { grid-template-columns: 1fr; } .page { padding: 28px 16px 48px; } }
-</style>
-</head>
-<body>
-
-<div class="page active" id="page1">
-  <h1>SAN SAN GEAR Job Application</h1>
-  <form id="appForm" novalidate>
-
-    <div class="field-label">지원 직종 <span class="req">*</span></div>
-    <div class="select-wrapper">
-      <select id="positionSelect" class="placeholder">
-        <option value="" disabled selected>직종을 선택해 주세요</option>
-      </select>
-      <svg class="select-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-    </div>
-    <div class="err" id="posErr">직종을 선택해 주세요.</div>
-
-    <div class="fields-row" style="margin-top:4px;">
-      <div class="field-group"><input type="text" id="lastName" placeholder="성 *" required></div>
-      <div class="field-group"><input type="text" id="firstName" placeholder="이름 *" required></div>
-    </div>
-    <div class="fields-row">
-      <div class="field-group"><input type="email" id="email" placeholder="Email"></div>
-      <div class="field-group"><input type="tel" id="phone" placeholder="Phone"></div>
-    </div>
-    <div class="fields-row">
-      <div class="field-group"><input type="url" id="sns" placeholder="SNS Link"></div>
-      <div class="field-group"><input type="url" id="other" placeholder="Other links"></div>
-    </div>
-
-    <div class="file-section">
-      <div class="field-label">이력서</div>
-      <div class="upload-box" id="resumeBox">
-        <input type="file" id="resumeFile" accept=".pdf,.doc,.docx">
-        <div class="upload-main"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Click to choose a file or drag here</div>
-        <div class="upload-hint">Size limit: 10 MB</div>
-        <div class="upload-filename" id="resumeName"></div>
-      </div>
-    </div>
-
-    <div class="file-section">
-      <div class="field-label">자기소개서 <span class="req">*</span></div>
-      <div class="upload-box" id="coverBox">
-        <input type="file" id="coverFile" accept=".pdf,.doc,.docx">
-        <div class="upload-main"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Click to choose a file or drag here</div>
-        <div class="upload-hint">Size limit: 10 MB</div>
-        <div class="upload-filename" id="coverName"></div>
-      </div>
-      <div class="err" id="coverErr">자기소개서를 첨부해 주세요.</div>
-    </div>
-
-    <div class="file-section">
-      <div class="field-label">포트폴리오</div>
-      <div class="upload-box" id="portfolioBox">
-        <input type="file" id="portfolioFile" accept=".pdf,.zip,.pptx,.key">
-        <div class="upload-main"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Click to choose a file or drag here</div>
-        <div class="upload-hint">Size limit: 10 MB</div>
-        <div class="upload-filename" id="portfolioName"></div>
-      </div>
-    </div>
-
-    <div class="submit-row">
-      <button type="submit" class="submit-btn" id="submitBtn">
-        Submit
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-      </button>
-      <div class="status-loading" id="statusLoading">⏳ 제출 중입니다... 잠시만 기다려 주세요.</div>
-      <div class="status-error" id="statusError">오류가 발생했습니다. 잠시 후 다시 시도해 주세요.</div>
-    </div>
-
-  </form>
-</div>
-
-<div class="page" id="page2">
-  <div class="thankyou-title">지원해주셔서 감사합니다!</div>
-  <div class="thankyou-sub">서류를 검토한 후 빠르게 연락드리겠습니다.</div>
-  <div class="tally-footer">
-    <span>Page 2</span>
-    <span class="toggle-label">'Thank you' page <span class="toggle-pill"></span></span>
-  </div>
-</div>
-
 <script>
-// ⚙️ /dev URL — 302 리다이렉트 없이 직접 응답
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwCEc8IXuxBReJ1we1FOuwjt_zZx0KdY3FOdlsMRJ2MdVjHwsv_JPpbhEPSypJQ4O_8/dev";
+// 반드시 Apps Script "웹 앱 배포" 후 받은 /exec URL로 교체
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwCEc8IXuxBReJ1we1FOuwjt_zZx0KdY3FOdlsMRJ2MdVjHwsv_JPpbhEPSypJQ4O_8/exec";
 
 const POSITIONS = [
-  { name: "Creative",                        visible: true },
-  { name: "Designer",                        visible: true },
-  { name: "Marketing",                       visible: true },
-  { name: "Logistics 담당자",                visible: true },
-  { name: "SCM 담당자",                      visible: true },
-  { name: "Sourcing 담당자",                 visible: true },
-  { name: "합정 스토어 매니저 / 스태프",     visible: true },
-  { name: "더현대 스토어 매니저 / 스태프",   visible: true },
+  { name: "Creative",                      visible: true },
+  { name: "Designer",                      visible: true },
+  { name: "Marketing",                     visible: true },
+  { name: "Logistics 담당자",              visible: true },
+  { name: "SCM 담당자",                    visible: true },
+  { name: "Sourcing 담당자",               visible: true },
+  { name: "합정 스토어 매니저 / 스태프",   visible: true },
+  { name: "더현대 스토어 매니저 / 스태프", visible: true },
 ];
 
 const select = document.getElementById("positionSelect");
+
 POSITIONS.filter(p => p.visible).forEach(p => {
   const opt = document.createElement("option");
-  opt.value = p.name; opt.textContent = p.name;
+  opt.value = p.name;
+  opt.textContent = p.name;
   select.appendChild(opt);
 });
+
 select.addEventListener("change", () => {
   select.classList.remove("placeholder");
   document.getElementById("posErr").style.display = "none";
@@ -158,61 +29,119 @@ select.addEventListener("change", () => {
 
 function setupUpload(inputId, boxId, nameId) {
   const input = document.getElementById(inputId);
-  const box   = document.getElementById(boxId);
-  const name  = document.getElementById(nameId);
-  const setFile = f => { name.textContent = "✓ " + f.name; box.classList.add("has-file"); };
-  input.addEventListener("change", () => { if (input.files[0]) setFile(input.files[0]); });
-  box.addEventListener("dragover",  e => { e.preventDefault(); box.classList.add("dragover"); });
-  box.addEventListener("dragleave", () => box.classList.remove("dragover"));
-  box.addEventListener("drop", e => {
-    e.preventDefault(); box.classList.remove("dragover");
-    if (e.dataTransfer.files[0]) { input.files = e.dataTransfer.files; setFile(e.dataTransfer.files[0]); }
+  const box = document.getElementById(boxId);
+  const name = document.getElementById(nameId);
+
+  const setFile = (file) => {
+    name.textContent = "✓ " + file.name;
+    box.classList.add("has-file");
+  };
+
+  input.addEventListener("change", () => {
+    if (input.files[0]) setFile(input.files[0]);
+  });
+
+  box.addEventListener("click", () => input.click());
+
+  box.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    box.classList.add("dragover");
+  });
+
+  box.addEventListener("dragleave", () => {
+    box.classList.remove("dragover");
+  });
+
+  box.addEventListener("drop", (e) => {
+    e.preventDefault();
+    box.classList.remove("dragover");
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      input.files = e.dataTransfer.files;
+      setFile(e.dataTransfer.files[0]);
+    }
   });
 }
-setupUpload("resumeFile",    "resumeBox",    "resumeName");
-setupUpload("coverFile",     "coverBox",     "coverName");
+
+setupUpload("resumeFile", "resumeBox", "resumeName");
+setupUpload("coverFile", "coverBox", "coverName");
 setupUpload("portfolioFile", "portfolioBox", "portfolioName");
 
 function fileToBase64(file) {
-  return new Promise((res, rej) => {
-    if (!file) return res(null);
-    const r = new FileReader();
-    r.onload = () => res(r.result.split(",")[1]);
-    r.onerror = rej;
-    r.readAsDataURL(file);
+  return new Promise((resolve, reject) => {
+    if (!file) {
+      resolve(null);
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      try {
+        const result = reader.result;
+        const base64 = String(result).split(",")[1];
+        resolve(base64);
+      } catch (err) {
+        reject(err);
+      }
+    };
+
+    reader.onerror = () => reject(new Error("파일 읽기에 실패했습니다."));
+    reader.readAsDataURL(file);
   });
 }
 
 function showPage(id) {
-  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll(".page").forEach((p) => p.classList.remove("active"));
   document.getElementById(id).classList.add("active");
   window.scrollTo(0, 0);
 }
 
-document.getElementById("appForm").addEventListener("submit", async e => {
+document.getElementById("appForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
   let valid = true;
+
   const position = select.value;
-  if (!position) { document.getElementById("posErr").style.display = "block"; valid = false; }
-  if (!document.getElementById("lastName").value.trim() || !document.getElementById("firstName").value.trim()) valid = false;
+  const lastNameEl = document.getElementById("lastName");
+  const firstNameEl = document.getElementById("firstName");
   const coverFile = document.getElementById("coverFile").files[0];
-  if (!coverFile) { document.getElementById("coverErr").style.display = "block"; valid = false; }
+
+  const posErr = document.getElementById("posErr");
+  const coverErr = document.getElementById("coverErr");
+
+  posErr.style.display = "none";
+  coverErr.style.display = "none";
+
+  if (!position) {
+    posErr.style.display = "block";
+    valid = false;
+  }
+
+  if (!lastNameEl.value.trim() || !firstNameEl.value.trim()) {
+    valid = false;
+  }
+
+  if (!coverFile) {
+    coverErr.style.display = "block";
+    valid = false;
+  }
+
   if (!valid) return;
 
-  const btn       = document.getElementById("submitBtn");
+  const btn = document.getElementById("submitBtn");
   const loadingEl = document.getElementById("statusLoading");
-  const errorEl   = document.getElementById("statusError");
+  const errorEl = document.getElementById("statusError");
 
   btn.disabled = true;
   loadingEl.style.display = "block";
-  errorEl.style.display   = "none";
+  errorEl.style.display = "none";
+  errorEl.textContent = "";
 
   try {
-    const resumeFile    = document.getElementById("resumeFile").files[0];
+    const resumeFile = document.getElementById("resumeFile").files[0];
     const portfolioFile = document.getElementById("portfolioFile").files[0];
 
-    const [r64, c64, p64] = await Promise.all([
+    const [resumeBase64, coverBase64, portfolioBase64] = await Promise.all([
       fileToBase64(resumeFile),
       fileToBase64(coverFile),
       fileToBase64(portfolioFile),
@@ -220,38 +149,57 @@ document.getElementById("appForm").addEventListener("submit", async e => {
 
     const payload = {
       position,
-      lastName:    document.getElementById("lastName").value.trim(),
-      firstName:   document.getElementById("firstName").value.trim(),
-      email:       document.getElementById("email").value.trim(),
-      phone:       document.getElementById("phone").value.trim(),
-      sns:         document.getElementById("sns").value.trim(),
-      other:       document.getElementById("other").value.trim(),
+      lastName: lastNameEl.value.trim(),
+      firstName: firstNameEl.value.trim(),
+      email: document.getElementById("email").value.trim(),
+      phone: document.getElementById("phone").value.trim(),
+      sns: document.getElementById("sns").value.trim(),
+      other: document.getElementById("other").value.trim(),
       submittedAt: new Date().toLocaleString("ko-KR", { timeZone: "Asia/Seoul" }),
-      resume:    resumeFile    ? { name: resumeFile.name,    data: r64 } : null,
-      cover:     coverFile     ? { name: coverFile.name,     data: c64 } : null,
-      portfolio: portfolioFile ? { name: portfolioFile.name, data: p64 } : null,
+      resume: resumeFile
+        ? { name: resumeFile.name, data: resumeBase64 }
+        : null,
+      cover: coverFile
+        ? { name: coverFile.name, data: coverBase64 }
+        : null,
+      portfolio: portfolioFile
+        ? { name: portfolioFile.name, data: portfolioBase64 }
+        : null,
     };
 
-    // 순수 POST — /dev URL은 302 없이 바로 응답
     const res = await fetch(APPS_SCRIPT_URL, {
       method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify(payload),
     });
 
-    const result = await res.json();
+    const rawText = await res.text();
 
-    if (result.status === "ok") {
-      showPage("page2");
-    } else {
+    let result;
+    try {
+      result = JSON.parse(rawText);
+    } catch {
+      throw new Error(`JSON 응답 파싱 실패: ${rawText.slice(0, 200)}`);
+    }
+
+    if (!res.ok) {
+      throw new Error(result.message || `HTTP ${res.status}`);
+    }
+
+    if (result.status !== "ok") {
       throw new Error(result.message || "서버 오류");
     }
 
-  } catch (err) {
     loadingEl.style.display = "none";
-    errorEl.style.display   = "block";
+    showPage("page2");
+  } catch (err) {
+    console.error("Submit failed:", err);
+    loadingEl.style.display = "none";
+    errorEl.textContent = "제출 실패: " + (err.message || "알 수 없는 오류");
+    errorEl.style.display = "block";
     btn.disabled = false;
   }
 });
 </script>
-</body>
-</html>
